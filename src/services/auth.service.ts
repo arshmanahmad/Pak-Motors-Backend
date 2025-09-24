@@ -1,8 +1,8 @@
-// src/services/auth.service.ts (snippets)
 import bcrypt from "bcrypt";
 import { EmailOtp } from "../models/email-otp";
 import { User } from "../models/user.model";
 import { env } from "../config/env";
+import { sendOtpEmail, sendWelcomeEmail } from "./email.service";
 
 const genCode = (len: number) => Math.floor(Math.random() * 10**len).toString().padStart(len, "0");
 
@@ -17,9 +17,16 @@ export async function requestSignupOtp(email: string) {
 		{ upsert: true, new: true, setDefaultsOnInsert: true }
 	);
 
-	// sendEmail(email, code) // implement provider
+	// Send OTP email
+	const emailResult = await sendOtpEmail(email, code, "signup");
+	
+	// In development, also return the code for testing
 	const isDev = env.NODE_ENV !== "production";
-	return { devCode: isDev ? code : undefined };
+	return { 
+		devCode: isDev ? code : undefined,
+		emailSent: emailResult.success,
+		messageId: emailResult.messageId
+	};
 }
 
 export async function verifySignupOtp(email: string, code: string) {

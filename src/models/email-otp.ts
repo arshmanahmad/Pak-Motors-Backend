@@ -7,7 +7,11 @@ const EmailOtpSchema = new Schema({
 	codeHash: { type: String, required: true },
 	expiresAt: { type: Date, required: true, expires: 0 }, // TTL: auto-delete at this time
 	attempts: { type: Number, default: 0 },
-	createdAt: { type: Date, default: Date.now }
+	createdAt: { type: Date, default: Date.now },
+	userData: { 
+		name: { type: String },
+		password: { type: String }
+	}
 }, { timestamps: false });
 
 EmailOtpSchema.index({ email: 1, purpose: 1 }, { unique: true });
