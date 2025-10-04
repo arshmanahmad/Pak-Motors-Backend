@@ -1,9 +1,22 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = require("./src/app");
 const env_1 = require("./src/config/env");
+const mongoose_1 = __importDefault(require("mongoose"));
 const app = (0, app_1.createApp)();
-app.listen(env_1.env.port, () => {
-    // eslint-disable-next-line no-console
-    console.log(`Server running on port ${env_1.env.port} in ${env_1.env.nodeEnv} mode`);
+// Connect to MongoDB
+mongoose_1.default.connect(env_1.env.MONGO_URL)
+    .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(env_1.env.PORT, () => {
+        // eslint-disable-next-line no-console
+        console.log(`Server running on port ${env_1.env.PORT} in ${env_1.env.NODE_ENV} mode`);
+    });
+})
+    .catch((error) => {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
 });

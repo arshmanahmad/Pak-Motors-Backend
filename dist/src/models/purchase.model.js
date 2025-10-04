@@ -1,8 +1,10 @@
-import { model, Schema, Types } from "mongoose";
-
-const PurchaseSchema = new Schema({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Purchase = void 0;
+const mongoose_1 = require("mongoose");
+const PurchaseSchema = new mongoose_1.Schema({
     userId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose_1.Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
@@ -46,7 +48,6 @@ const PurchaseSchema = new Schema({
         type: String,
         required: true
     },
-    
     // New car specific fields
     invoiceName: {
         type: String,
@@ -60,7 +61,6 @@ const PurchaseSchema = new Schema({
         type: Date,
         required: false
     },
-    
     // Checkboxes
     invoiceReceived: {
         type: Boolean,
@@ -86,7 +86,6 @@ const PurchaseSchema = new Schema({
         type: Boolean,
         default: false
     },
-    
     // Purchase details
     purchaseAmount: {
         type: Number,
@@ -94,8 +93,8 @@ const PurchaseSchema = new Schema({
         min: 0
     },
     attachedDocuments: [{
-        type: String // Array of file paths/URLs
-    }],
+            type: String // Array of file paths/URLs
+        }],
     purchaseFrom: {
         type: String,
         required: true
@@ -107,12 +106,11 @@ const PurchaseSchema = new Schema({
     note: {
         type: String
     }
-}, { 
+}, {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
-
 // Indexes for better query performance
 PurchaseSchema.index({ userId: 1 });
 PurchaseSchema.index({ company: 1 });
@@ -122,5 +120,4 @@ PurchaseSchema.index({ serialNo: 1 });
 PurchaseSchema.index({ engineNumber: 1 });
 PurchaseSchema.index({ chasisNumber: 1 });
 PurchaseSchema.index({ registration: 1 });
-
-export const Purchase = model("Purchase", PurchaseSchema);
+exports.Purchase = (0, mongoose_1.model)("Purchase", PurchaseSchema);

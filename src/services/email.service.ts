@@ -123,7 +123,7 @@ export const sendOtpEmail = async (email: string, code: string, purpose: 'signup
     const result = await transporter.sendMail(mailOptions);
     console.log(`OTP email sent to ${email}:`, result.messageId);
     return { success: true, messageId: result.messageId };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending OTP email:', error);
     return { success: false, error: error.message };
   }
@@ -200,7 +200,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
     const result = await transporter.sendMail(mailOptions);
     console.log(`Welcome email sent to ${email}:`, result.messageId);
     return { success: true, messageId: result.messageId };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending welcome email:', error);
     return { success: false, error: error.message };
   }
