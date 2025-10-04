@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { EmailOtp } from "../models/email-otp";
+import { EmailOtp } from "../models/email-otp.model";
 import { User } from "../models/user.model";
 import { env } from "../config/env";
 import { sendOtpEmail, sendWelcomeEmail } from "./email.service";
@@ -10,7 +10,7 @@ export async function requestSignupOtp(email: string) {
 	const code = genCode(Number(process.env.OTP_LENGTH || 6));
 	const codeHash = await bcrypt.hash(code, env.BCRYPT_SALT_ROUNDS);
 	const expiresAt = new Date(Date.now() + Number(process.env.OTP_EXP_MIN || 10) * 60 * 1000);
-
+S
 	await EmailOtp.findOneAndUpdate(
 		{ email, purpose: "signup" },
 		{ codeHash, expiresAt, attempts: 0, createdAt: new Date() },

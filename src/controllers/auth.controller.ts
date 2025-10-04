@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 import bcrypt from "bcrypt";
 import { User } from "../models/user.model";
-import { EmailOtp } from "../models/email-otp";
+import { EmailOtp } from "../models/email-otp.model";
 import { requestSignupOtp as requestSignupOtpSvc } from "../services/auth.service";
 import { sendWelcomeEmail, sendOtpEmail } from "../services/email.service";
 
