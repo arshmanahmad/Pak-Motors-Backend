@@ -2,6 +2,8 @@ import express from "express";
 import healthRouter from "./routes/health.route";
 import { authRouter } from "./routes/auth.route";
 import { purchaseRouter } from "./routes/purchase.route";
+import { companyRouter } from "./routes/company.route";
+import { carModelRouter } from "./routes/car-model.route";
 
 export const createApp = () => {
   const app = express();
@@ -11,6 +13,8 @@ export const createApp = () => {
   app.use("/api", healthRouter);
   app.use("/api/auth", authRouter);
   app.use("/api/purchases", purchaseRouter);
+  app.use("/api/companies", companyRouter);
+  app.use("/api/models", carModelRouter);
 
   app.get("/", (_req, res) => {
     res.json({ name: "Pak Motors API" });
