@@ -109,18 +109,9 @@ const PurchaseSchema = new Schema({
     }
 }, { 
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+   
 });
 
-// Indexes for better query performance
-PurchaseSchema.index({ userId: 1 });
-PurchaseSchema.index({ company: 1 });
-PurchaseSchema.index({ carModel: 1 });
-PurchaseSchema.index({ isNew: 1 });
-PurchaseSchema.index({ serialNo: 1 });
-PurchaseSchema.index({ engineNumber: 1 });
-PurchaseSchema.index({ chasisNumber: 1 });
-PurchaseSchema.index({ registration: 1 });
+
 
 export const Purchase = model("Purchase", PurchaseSchema);
