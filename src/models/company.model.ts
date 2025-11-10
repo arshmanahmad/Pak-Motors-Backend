@@ -17,7 +17,6 @@ const CompanySchema = new Schema({
     timestamps: true
 });
 
-CompanySchema.index({ userId: 1, name: 1 }, { unique: true });
 
 export const Company = model("Company", CompanySchema);
 

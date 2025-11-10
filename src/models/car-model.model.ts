@@ -23,7 +23,6 @@ const CarModelSchema = new Schema({
 });
 
 // Unique model name per user per company
-CarModelSchema.index({ userId: 1, companyId: 1, name: 1 }, { unique: true });
 
 export const CarModel = model("CarModel", CarModelSchema);
 

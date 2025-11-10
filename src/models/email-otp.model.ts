@@ -14,6 +14,5 @@ const EmailOtpSchema = new Schema({
 	}
 }, { timestamps: false });
 
-EmailOtpSchema.index({ email: 1, purpose: 1 }, { unique: true });
 
 export const EmailOtp = model("EmailOtp", EmailOtpSchema);
