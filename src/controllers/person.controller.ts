@@ -7,8 +7,9 @@ import { StatusCodes } from "http-status-codes";
 export const createPerson = async (req: Request, res: Response) => {
   try {
     const validatedData = req.body; // Data is already validated by middleware
+    const userId = (req as any).userId; // Get userId from token (set by authenticate middleware)
 
-    const person = new Person(validatedData);
+    const person = new Person({ ...validatedData, userId });
     await person.save();
 
     ApiResponse.success(

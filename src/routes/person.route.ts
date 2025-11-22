@@ -15,12 +15,19 @@ import { IdParamsSchema } from "../schema/common.schema";
 
 export const personRouter = Router();
 
-// All person routes require authentication
-personRouter.use(authenticate);
+// Person CRUD operations with validation BEFORE authentication
+personRouter.post("/", validateBody(PersonSchema), authenticate, createPerson);
 
-// Person CRUD operations with validation
-personRouter.post("/", validateBody(PersonSchema), createPerson);
+personRouter.get(
+  "/",
+  validateQuery(PersonQuerySchema),
+  authenticate,
+  getAllPersons
+);
 
-personRouter.get("/", validateQuery(PersonQuerySchema), getAllPersons);
-
-personRouter.get("/:id", validateParams(IdParamsSchema), getPersonById);
+personRouter.get(
+  "/:id",
+  validateParams(IdParamsSchema),
+  authenticate,
+  getPersonById
+);

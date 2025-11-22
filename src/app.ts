@@ -5,6 +5,7 @@ import { purchaseRouter } from "./routes/purchase.route";
 import { companyRouter } from "./routes/company.route";
 import { carModelRouter } from "./routes/car-model.route";
 import { personRouter } from "./routes/person.route";
+import { saleRouter } from "./routes/sale.route";
 import { env } from "./config/env";
 import cors from "cors";
 
@@ -32,6 +33,7 @@ export const createApp = () => {
   app.use("/api/companies", companyRouter);
   app.use("/api/models", carModelRouter);
   app.use("/api/persons", personRouter);
+  app.use("/api/sales", saleRouter);
 
   app.get("/", (_req, res) => {
     res.json({ name: "Pak Motors API" });

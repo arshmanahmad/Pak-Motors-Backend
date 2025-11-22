@@ -24,12 +24,40 @@
 
 ## Environment
 
-Create a `.env` file (use this template):
+The application uses environment-specific configuration files based on `NODE_ENV`:
 
-```
-NODE_ENV=development
-PORT=3000
-```
+- `.env.development` - for development environment
+- `.env.production` - for production environment
+- `.env.production.local` - for local production testing
+
+### Setup
+
+1. Copy the example file based on your environment:
+
+   ```bash
+   # For development
+   cp .env.development.example .env.development
+
+   # For production
+   cp .env.production.example .env.production
+   ```
+
+2. Update the values in your `.env.{NODE_ENV}` file with your actual configuration.
+
+### Required Environment Variables
+
+- `NODE_ENV` - Environment name (development, production, production.local, test)
+- `HOST` - Server host (default: localhost)
+- `PORT` - Server port (default: 3000)
+- `CORS_ORIGIN` - Allowed CORS origins (semicolon-separated for multiple)
+- `MONGO_URL` - MongoDB connection string
+- `JWT_SECRET_KEY` - Secret key for JWT token signing
+- `JWT_EXPIRES_IN` - JWT token expiration (e.g., "1d", "7d")
+- `BCRYPT_SALT_ROUNDS` - Salt rounds for password hashing (default: 10)
+- `EMAIL_USER` - Email address for sending OTPs
+- `EMAIL_PASSWORD` - App-specific password for email account
+
+See `.env.example` for a complete list of all available environment variables.
 
 ## Scripts
 

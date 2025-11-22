@@ -11,10 +11,10 @@ export const PersonSchema = z.object({
   picture: z.string().optional(), // File path or URL
   signature: z.string().optional(), // File path or URL
   fingerprint: z.string().optional(), // Fingerprint data or file path
-  userId: z.string().min(1, "User ID is required"),
+  // userId is extracted from JWT token in authenticate middleware
 });
 
-export const UpdatePersonSchema = PersonSchema.partial().omit({ userId: true });
+export const UpdatePersonSchema = PersonSchema.partial();
 
 export const PersonQuerySchema = z.object({
   page: z

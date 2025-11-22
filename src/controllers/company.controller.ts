@@ -6,8 +6,10 @@ import { StatusCodes } from "http-status-codes";
 export const createCompany = async (req: Request, res: Response) => {
   try {
     const data = req.body;
+    const userId = (req as any).userId; // Get userId from token (set by authenticate middleware)
+
     const exists = await Company.findOne({
-      userId: data.userId,
+      userId: userId,
       name: data.name,
     });
     if (exists)
@@ -17,7 +19,7 @@ export const createCompany = async (req: Request, res: Response) => {
         "Company already exists",
         null
       );
-    const company = await Company.create(data);
+    const company = await Company.create({ ...data, userId });
     return ApiResponse.success(
       res,
       StatusCodes.CREATED,
@@ -94,10 +96,12 @@ export const updateCompany = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const data = req.body;
+    const userId = (req as any).userId; // Get userId from token (set by authenticate middleware)
+
     if (data.name) {
       const exists = await Company.findOne({
         _id: { $ne: id },
-        userId: data.userId,
+        userId: userId,
         name: data.name,
       });
       if (exists)
