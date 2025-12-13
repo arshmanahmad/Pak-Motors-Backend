@@ -21,32 +21,47 @@ export const validateRequest = (schemas: ValidationOptions) => {
 
       // Validate query parameters
       if (schemas.query) {
-        req.query = await schemas.query.parseAsync(req.query) as any;
+        const validatedQuery = await schemas.query.parseAsync(req.query);
+        // Store validated query in a custom property since req.query is read-only
+        // Controllers should use req.validatedQuery when available, otherwise fall back to req.query
+        (req as any).validatedQuery = validatedQuery;
       }
 
       // Validate route parameters
       if (schemas.params) {
-        req.params = await schemas.params.parseAsync(req.params) as any;
+        req.params = (await schemas.params.parseAsync(req.params)) as any;
       }
 
       next();
     } catch (error: any) {
       // Handle Zod validation errors
-      if (error.name === 'ZodError') {
-        const errorMessages = error.errors.map((err: any) => ({
-          field: err.path.join('.'),
-          message: err.message,
-          code: err.code
-        }));
+      if (error.name === "ZodError") {
+        const errorMessages = (error.issues ?? error.errors ?? []).map(
+          (err: any) => ({
+            field: err.path.join("."),
+            message: err.message,
+            code: err.code,
+          })
+        );
 
-        return ApiResponse.error(res, StatusCodes.BAD_REQUEST, "Validation failed", {
-          errors: errorMessages,
-          message: "Please check your input and try again"
-        });
+        return ApiResponse.error(
+          res,
+          StatusCodes.BAD_REQUEST,
+          "Validation failed",
+          {
+            errors: errorMessages,
+            message: "Please check your input and try again",
+          }
+        );
       }
 
       // Handle other errors
-      return ApiResponse.error(res, StatusCodes.INTERNAL_SERVER_ERROR, "Validation error", error.message);
+      return ApiResponse.error(
+        res,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "Validation error",
+        error.message
+      );
     }
   };
 };
@@ -71,20 +86,32 @@ export const validateRequestLegacy = (schema: z.ZodSchema) => {
       req.body = await schema.parseAsync(req.body);
       next();
     } catch (error: any) {
-      if (error.name === 'ZodError') {
-        const errorMessages = error.errors.map((err: any) => ({
-          field: err.path.join('.'),
-          message: err.message,
-          code: err.code
-        }));
+      if (error.name === "ZodError") {
+        const errorMessages = (error.issues ?? error.errors ?? []).map(
+          (err: any) => ({
+            field: err.path.join("."),
+            message: err.message,
+            code: err.code,
+          })
+        );
 
-        return ApiResponse.error(res, StatusCodes.BAD_REQUEST, "Validation failed", {
-          errors: errorMessages,
-          message: "Please check your input and try again"
-        });
+        return ApiResponse.error(
+          res,
+          StatusCodes.BAD_REQUEST,
+          "Validation failed",
+          {
+            errors: errorMessages,
+            message: "Please check your input and try again",
+          }
+        );
       }
 
-      return ApiResponse.error(res, StatusCodes.INTERNAL_SERVER_ERROR, "Validation error", error.message);
+      return ApiResponse.error(
+        res,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "Validation error",
+        error.message
+      );
     }
   };
 };
