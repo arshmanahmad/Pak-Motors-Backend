@@ -5,13 +5,20 @@ import path from 'path';
 
 const nodeEnvironment = process.env.NODE_ENV || 'development';
 
+// Try to load environment-specific .env file first
 const envPath = nodeEnvironment !== 'production' ? path.resolve(process.cwd(), `.env.${nodeEnvironment}`) : null;
 
 if (envPath && fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
 } else {
-  if (nodeEnvironment !== 'production') {
-    console.error(`Environment file .env.${process.env.NODE_ENV} not found`);
+  // Fallback to plain .env file if environment-specific file doesn't exist
+  const defaultEnvPath = path.resolve(process.cwd(), '.env');
+  if (fs.existsSync(defaultEnvPath)) {
+    dotenv.config({ path: defaultEnvPath });
+  } else {
+    if (nodeEnvironment !== 'production') {
+      console.error(`Environment file .env.${process.env.NODE_ENV} not found, and .env file not found`);
+    }
   }
 }
 
