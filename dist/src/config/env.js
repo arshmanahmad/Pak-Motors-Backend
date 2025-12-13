@@ -9,13 +9,21 @@ const envalid_1 = require("envalid");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const nodeEnvironment = process.env.NODE_ENV || 'development';
+// Try to load environment-specific .env file first
 const envPath = nodeEnvironment !== 'production' ? path_1.default.resolve(process.cwd(), `.env.${nodeEnvironment}`) : null;
 if (envPath && fs_1.default.existsSync(envPath)) {
     dotenv_1.default.config({ path: envPath });
 }
 else {
-    if (nodeEnvironment !== 'production') {
-        console.error(`Environment file .env.${process.env.NODE_ENV} not found`);
+    // Fallback to plain .env file if environment-specific file doesn't exist
+    const defaultEnvPath = path_1.default.resolve(process.cwd(), '.env');
+    if (fs_1.default.existsSync(defaultEnvPath)) {
+        dotenv_1.default.config({ path: defaultEnvPath });
+    }
+    else {
+        if (nodeEnvironment !== 'production') {
+            console.error(`Environment file .env.${process.env.NODE_ENV} not found, and .env file not found`);
+        }
     }
 }
 exports.env = (0, envalid_1.cleanEnv)(process.env, {

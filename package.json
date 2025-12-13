@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx watch index.ts",
-    "build": "cross-env NODE_ENV=production.local tsc",
+    "build": "cross-env NODE_ENV=production tsc",
     "start": "cross-env NODE_ENV=prodduction dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

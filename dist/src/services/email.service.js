@@ -9,7 +9,7 @@ const env_1 = require("../config/env");
 // Create transporter for sending emails
 const createTransporter = () => {
     return nodemailer_1.default.createTransport({
-        service: 'hotmail', // Using Outlook/Hotmail instead of Gmail
+        service: 'gmail', // Using Outlook/Hotmail instead of Gmail
         auth: {
             user: env_1.env.EMAIL_USER,
             pass: env_1.env.EMAIL_PASSWORD
@@ -20,7 +20,19 @@ const createTransporter = () => {
 const getOtpEmailTemplate = (code, purpose) => {
     const subject = purpose === 'signup'
         ? 'Verify Your Email - Pak Motors'
-        : 'Reset Your Password - Pak Motors';
+        : purpose === 'login'
+            ? 'Login Verification Code - Pak Motors'
+            : 'Reset Your Password - Pak Motors';
+    const heading = purpose === 'signup'
+        ? 'Welcome to Pak Motors!'
+        : purpose === 'login'
+            ? 'Login Verification'
+            : 'Password Reset Request';
+    const intro = purpose === 'signup'
+        ? 'Thank you for signing up with Pak Motors. To complete your registration, please verify your email address using the OTP below:'
+        : purpose === 'login'
+            ? 'Use the OTP below to verify your login and continue securely:'
+            : 'You have requested to reset your password. Use the OTP below to proceed:';
     const html = `
     <!DOCTYPE html>
     <html>
@@ -36,11 +48,9 @@ const getOtpEmailTemplate = (code, purpose) => {
       </div>
       
       <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
-        <h2 style="color: #333; margin-top: 0;">${purpose === 'signup' ? 'Welcome to Pak Motors!' : 'Password Reset Request'}</h2>
+        <h2 style="color: #333; margin-top: 0;">${heading}</h2>
         <p style="font-size: 16px; margin-bottom: 25px;">
-          ${purpose === 'signup'
-        ? 'Thank you for signing up with Pak Motors. To complete your registration, please verify your email address using the OTP below:'
-        : 'You have requested to reset your password. Use the OTP below to proceed:'}
+          ${intro}
         </p>
         
         <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; border: 2px dashed #667eea;">
@@ -53,7 +63,7 @@ const getOtpEmailTemplate = (code, purpose) => {
       </div>
       
       <div style="text-align: center; color: #666; font-size: 14px;">
-        <p>If you didn't request this ${purpose === 'signup' ? 'verification' : 'password reset'}, please ignore this email.</p>
+        <p>If you didn't request this ${purpose === 'signup' ? 'verification' : purpose === 'login' ? 'login verification' : 'password reset'}, please ignore this email.</p>
         <p style="margin-top: 20px;">
           <strong>Pak Motors Team</strong><br>
           Your trusted automotive partner
@@ -63,44 +73,28 @@ const getOtpEmailTemplate = (code, purpose) => {
     </html>
   `;
     const text = `
-    ${purpose === 'signup' ? 'Welcome to Pak Motors!' : 'Password Reset Request'}
-    
-    ${purpose === 'signup'
-        ? 'Thank you for signing up with Pak Motors. To complete your registration, please verify your email address using the OTP below:'
-        : 'You have requested to reset your password. Use the OTP below to proceed:'}
-    
-    Your OTP: ${code}
-    
-    This OTP is valid for 10 minutes and can only be used once.
-    
-    If you didn't request this ${purpose === 'signup' ? 'verification' : 'password reset'}, please ignore this email.
-    
-    Pak Motors Team
+${heading}
+
+${intro}
+
+Your OTP: ${code}
+
+This OTP is valid for 10 minutes and can only be used once.
+
+If you didn't request this ${purpose === 'signup' ? 'verification' : purpose === 'login' ? 'login verification' : 'password reset'}, please ignore this email.
+
+Pak Motors Team
   `;
     return { subject, html, text };
 };
 const sendOtpEmail = async (email, code, purpose = 'signup') => {
     try {
-        // In development mode, skip actual email sending
-        const isDev = env_1.env.NODE_ENV !== 'production';
-        if (isDev) {
-            console.log('🔧 DEVELOPMENT MODE: Email sending disabled');
-            console.log(`📧 Would send OTP ${code} to ${email}`);
-            console.log('📝 Email content:', {
-                subject: purpose === 'signup' ? 'Verify Your Email - Pak Motors' : 'Reset Your Password - Pak Motors',
-                code: code,
-                recipient: email
-            });
-            return {
-                success: true,
-                messageId: 'dev-mode-' + Date.now(),
-                devMode: true
-            };
-        }
+        // ALWAYS send email now (no dev short-circuit)
         console.log('Email config:', {
             user: env_1.env.EMAIL_USER,
             hasPassword: !!env_1.env.EMAIL_PASSWORD,
-            email: email
+            email: email,
+            purpose
         });
         const transporter = createTransporter();
         const { subject, html, text } = getOtpEmailTemplate(code, purpose);
@@ -111,7 +105,7 @@ const sendOtpEmail = async (email, code, purpose = 'signup') => {
             text,
             html
         };
-        console.log('Sending email with options:', { to: email, subject });
+        console.log('Sending email with options:', { to: email, subject, purpose });
         const result = await transporter.sendMail(mailOptions);
         console.log(`OTP email sent to ${email}:`, result.messageId);
         return { success: true, messageId: result.messageId };
@@ -167,15 +161,15 @@ const sendWelcomeEmail = async (email, name) => {
       </html>
     `;
         const text = `
-      Welcome to Pak Motors!
-      
-      Hello ${name}!
-      
-      Thank you for joining Pak Motors! Your account has been successfully created and verified.
-      
-      You can now access all our services and start your automotive journey with us.
-      
-      Pak Motors Team
+Welcome to Pak Motors!
+
+Hello ${name}!
+
+Thank you for joining Pak Motors! Your account has been successfully created and verified.
+
+You can now access all our services and start your automotive journey with us.
+
+Pak Motors Team
     `;
         const mailOptions = {
             from: `"Pak Motors" <${env_1.env.EMAIL_USER}>`,
