@@ -13,41 +13,31 @@
 │  │  └─ health.route.ts       # Route definitions and middleware composition
 │  └─ config/
 │     └─ env.ts          # Centralized environment configuration
-├─ tsconfig.json         # Compiles both root index.ts and src/**/* to dist/
-└─ package.json          # Scripts for dev/build/start
+├─ .env                  # Environment variables (single file for all environments)
+├─ tsconfig.json         # TypeScript configuration
+└─ package.json          # Scripts and dependencies
 ```
 
-- `index.ts` at root: clean separation between app creation (`src/app.ts`) and process concerns (port, env, listening). Keeping it at root makes deployment/PM2/Docker commands straightforward and keeps `src/` purely application code.
-- `src/app.ts`: builds and returns an Express app. No `listen()` here, so the app can be reused in tests or serverless if needed.
-- `controllers` vs `routes`: routes wire URL paths to controllers and compose middleware; controllers hold the request handling logic for clarity and testability.
-- `config/env.ts`: loads `.env` once and exposes a typed config object so the rest of the code imports config instead of touching `process.env` everywhere.
+- `index.ts` at root: single entrypoint that starts the server
+- `src/app.ts`: creates and configures the Express app (no network I/O)
+- `controllers` vs `routes`: routes wire URL paths to controllers and compose middleware; controllers hold the request handling logic
+- `config/env.ts`: loads `.env` file and exposes typed config object
+- `.env`: single environment file used for all environments
 
-## Environment
+## Environment Setup
 
-The application uses environment-specific configuration files based on `NODE_ENV`:
+Create a `.env` file in the root directory with your configuration:
 
-- `.env.development` - for development environment
-- `.env.production` - for production environment
-- `.env.production.local` - for local production testing
+```bash
+cp env.example .env
+```
 
-### Setup
-
-1. Copy the example file based on your environment:
-
-   ```bash
-   # For development
-   cp .env.development.example .env.development
-
-   # For production
-   cp .env.production.example .env.production
-   ```
-
-2. Update the values in your `.env.{NODE_ENV}` file with your actual configuration.
+Then update the values in `.env` with your actual configuration.
 
 ### Required Environment Variables
 
-- `NODE_ENV` - Environment name (development, production, production.local, test)
-- `HOST` - Server host (default: localhost)
+- `NODE_ENV` - Environment name (development, production, etc.)
+- `HOST` - Server host (default: localhost, use 0.0.0.0 for production)
 - `PORT` - Server port (default: 3000)
 - `CORS_ORIGIN` - Allowed CORS origins (semicolon-separated for multiple)
 - `MONGO_URL` - MongoDB connection string
@@ -57,13 +47,12 @@ The application uses environment-specific configuration files based on `NODE_ENV
 - `EMAIL_USER` - Email address for sending OTPs
 - `EMAIL_PASSWORD` - App-specific password for email account
 
-See `.env.example` for a complete list of all available environment variables.
+See `env.example` for a complete template.
 
 ## Scripts
 
-- `npm run dev`: run with hot-reload via ts-node-dev
-- `npm run build`: compile to `dist/`
-- `npm start`: run compiled build from `dist/`
+- `npm run dev`: run in development mode with hot-reload
+- `npm run start`: run in production mode
 
 ## Health check
 

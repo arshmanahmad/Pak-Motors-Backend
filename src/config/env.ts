@@ -5,20 +5,15 @@ import path from "path";
 
 const nodeEnvironment = process.env.NODE_ENV || "development";
 
-let envPath: string;
+// Always load .env file
+const envPath = path.resolve(process.cwd(), ".env");
 
-if (nodeEnvironment === "production") {
-  envPath = path.resolve(process.cwd(), ".env.production");
-} else {
-  envPath = path.resolve(process.cwd(), `.env.${nodeEnvironment}`);
-}
-
-// Load the file
+// Load the .env file
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
-  console.log(`Loaded environment file: ${envPath}`);
+  console.log(`Loaded environment file: .env`);
 } else {
-  console.error(`Environment file ${envPath} not found`);
+  console.warn(`Environment file .env not found`);
 }
 
 export const env = cleanEnv(process.env, {
