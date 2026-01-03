@@ -13,6 +13,7 @@ if (nodeEnvironment === "production") {
   envPath = path.resolve(process.cwd(), `.env.${nodeEnvironment}`);
 }
 
+// Load the file
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
   console.log(`Loaded environment file: ${envPath}`);
