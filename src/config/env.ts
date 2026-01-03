@@ -5,24 +5,19 @@ import path from "path";
 
 const nodeEnvironment = process.env.NODE_ENV || "development";
 
-// Try to load environment-specific .env file first
-const envPath = path.resolve(process.cwd(), `.env.${nodeEnvironment}`);
+let envPath: string;
+
+if (nodeEnvironment === "production") {
+  envPath = path.resolve(process.cwd(), ".env.production");
+} else {
+  envPath = path.resolve(process.cwd(), `.env.${nodeEnvironment}`);
+}
 
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
-  console.log(`Loaded environment file: .env.${nodeEnvironment}`);
+  console.log(`Loaded environment file: ${envPath}`);
 } else {
-  console.warn(`Environment file .env.${nodeEnvironment} not found`);
-  // Fallback to plain .env file if environment-specific file doesn't exist
-  const defaultEnvPath = path.resolve(process.cwd(), ".env");
-  if (fs.existsSync(defaultEnvPath)) {
-    dotenv.config({ path: defaultEnvPath });
-    console.log(`Loaded fallback environment file: .env`);
-  } else {
-    console.error(
-      `No environment file found: tried .env.${nodeEnvironment} and .env`
-    );
-  }
+  console.error(`Environment file ${envPath} not found`);
 }
 
 export const env = cleanEnv(process.env, {
