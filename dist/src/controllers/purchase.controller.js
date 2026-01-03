@@ -9,27 +9,36 @@ const purchase_types_1 = require("../types/purchase.types");
 const createPurchase = async (req, res) => {
     try {
         const validatedData = req.body; // Data is already validated by middleware
+        const userId = req.userId; // Get userId from token (set by authenticate middleware)
         // Check if serial number already exists
-        const existingSerial = await purchase_model_1.Purchase.findOne({ serialNo: validatedData.serialNo });
+        const existingSerial = await purchase_model_1.Purchase.findOne({
+            serialNo: validatedData.serialNo,
+        });
         if (existingSerial) {
             return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Serial number already exists", null);
         }
         // Check if engine number already exists
-        const existingEngine = await purchase_model_1.Purchase.findOne({ engineNumber: validatedData.engineNumber });
+        const existingEngine = await purchase_model_1.Purchase.findOne({
+            engineNumber: validatedData.engineNumber,
+        });
         if (existingEngine) {
             return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Engine number already exists", null);
         }
         // Check if chasis number already exists
-        const existingChasis = await purchase_model_1.Purchase.findOne({ chasisNumber: validatedData.chasisNumber });
+        const existingChasis = await purchase_model_1.Purchase.findOne({
+            chasisNumber: validatedData.chasisNumber,
+        });
         if (existingChasis) {
             return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Chasis number already exists", null);
         }
         // Check if registration number already exists
-        const existingRegistration = await purchase_model_1.Purchase.findOne({ registration: validatedData.registration });
+        const existingRegistration = await purchase_model_1.Purchase.findOne({
+            registration: validatedData.registration,
+        });
         if (existingRegistration) {
             return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Registration number already exists", null);
         }
-        const purchase = new purchase_model_1.Purchase(validatedData);
+        const purchase = new purchase_model_1.Purchase({ ...validatedData, userId });
         await purchase.save();
         response_1.ApiResponse.success(res, http_status_codes_1.StatusCodes.CREATED, "Purchase created successfully", purchase);
     }
@@ -41,18 +50,18 @@ exports.createPurchase = createPurchase;
 // Get all purchases with pagination and filtering
 const getPurchases = async (req, res) => {
     try {
-        const { page = 1, limit = 10, search, company, carModel, isNew } = req.query; // Data is already validated by middleware
+        const { page = 1, limit = 10, search, company, carModel, isNew, } = req.query; // Data is already validated by middleware
         const skip = (Number(page) - 1) * Number(limit);
         const filter = {};
         // Apply filters
         if (search) {
             filter.$or = [
-                { serialNo: { $regex: search, $options: 'i' } },
-                { company: { $regex: search, $options: 'i' } },
-                { carModel: { $regex: search, $options: 'i' } },
-                { engineNumber: { $regex: search, $options: 'i' } },
-                { chasisNumber: { $regex: search, $options: 'i' } },
-                { registration: { $regex: search, $options: 'i' } }
+                { serialNo: { $regex: search, $options: "i" } },
+                { company: { $regex: search, $options: "i" } },
+                { carModel: { $regex: search, $options: "i" } },
+                { engineNumber: { $regex: search, $options: "i" } },
+                { chasisNumber: { $regex: search, $options: "i" } },
+                { registration: { $regex: search, $options: "i" } },
             ];
         }
         if (company)
@@ -62,7 +71,7 @@ const getPurchases = async (req, res) => {
         if (isNew !== undefined)
             filter.isNew = isNew;
         const purchases = await purchase_model_1.Purchase.find(filter)
-            .populate('userId', 'name email')
+            .populate("userId", "name email")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit));
@@ -73,8 +82,8 @@ const getPurchases = async (req, res) => {
                 page: Number(page),
                 limit: Number(limit),
                 total,
-                pages: Math.ceil(total / Number(limit))
-            }
+                pages: Math.ceil(total / Number(limit)),
+            },
         });
     }
     catch (error) {
@@ -86,7 +95,7 @@ exports.getPurchases = getPurchases;
 const getPurchaseById = async (req, res) => {
     try {
         const { id } = req.params; // ID is already validated by middleware
-        const purchase = await purchase_model_1.Purchase.findById(id).populate('userId', 'name email');
+        const purchase = await purchase_model_1.Purchase.findById(id).populate("userId", "name email");
         if (!purchase) {
             return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.NOT_FOUND, "Purchase not found", null);
         }
@@ -106,7 +115,7 @@ const updatePurchase = async (req, res) => {
         if (validatedData.serialNo) {
             const existingSerial = await purchase_model_1.Purchase.findOne({
                 serialNo: validatedData.serialNo,
-                _id: { $ne: id }
+                _id: { $ne: id },
             });
             if (existingSerial) {
                 return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Serial number already exists", null);
@@ -115,7 +124,7 @@ const updatePurchase = async (req, res) => {
         if (validatedData.engineNumber) {
             const existingEngine = await purchase_model_1.Purchase.findOne({
                 engineNumber: validatedData.engineNumber,
-                _id: { $ne: id }
+                _id: { $ne: id },
             });
             if (existingEngine) {
                 return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Engine number already exists", null);
@@ -124,7 +133,7 @@ const updatePurchase = async (req, res) => {
         if (validatedData.chasisNumber) {
             const existingChasis = await purchase_model_1.Purchase.findOne({
                 chasisNumber: validatedData.chasisNumber,
-                _id: { $ne: id }
+                _id: { $ne: id },
             });
             if (existingChasis) {
                 return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Chasis number already exists", null);
@@ -133,13 +142,16 @@ const updatePurchase = async (req, res) => {
         if (validatedData.registration) {
             const existingRegistration = await purchase_model_1.Purchase.findOne({
                 registration: validatedData.registration,
-                _id: { $ne: id }
+                _id: { $ne: id },
             });
             if (existingRegistration) {
                 return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.CONFLICT, "Registration number already exists", null);
             }
         }
-        const purchase = await purchase_model_1.Purchase.findByIdAndUpdate(id, validatedData, { new: true, runValidators: true }).populate('userId', 'name email');
+        const purchase = await purchase_model_1.Purchase.findByIdAndUpdate(id, validatedData, {
+            new: true,
+            runValidators: true,
+        }).populate("userId", "name email");
         if (!purchase) {
             return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.NOT_FOUND, "Purchase not found", null);
         }
@@ -173,19 +185,19 @@ const getPurchaseStats = async (req, res) => {
                 $group: {
                     _id: null,
                     totalPurchases: { $sum: 1 },
-                    newCars: { $sum: { $cond: ['$isNew', 1, 0] } },
-                    usedCars: { $sum: { $cond: ['$isNew', 0, 1] } },
-                    totalAmount: { $sum: '$purchaseAmount' },
-                    averageAmount: { $avg: '$purchaseAmount' }
-                }
-            }
+                    newCars: { $sum: { $cond: ["$isNew", 1, 0] } },
+                    usedCars: { $sum: { $cond: ["$isNew", 0, 1] } },
+                    totalAmount: { $sum: "$purchaseAmount" },
+                    averageAmount: { $avg: "$purchaseAmount" },
+                },
+            },
         ]);
         const result = stats[0] || {
             totalPurchases: 0,
             newCars: 0,
             usedCars: 0,
             totalAmount: 0,
-            averageAmount: 0
+            averageAmount: 0,
         };
         response_1.ApiResponse.success(res, http_status_codes_1.StatusCodes.OK, "Purchase statistics retrieved successfully", result);
     }
@@ -200,7 +212,7 @@ const getDropdownOptions = async (req, res) => {
         const options = {
             horsePower: purchase_types_1.HORSE_POWER_OPTIONS,
             colors: purchase_types_1.COLOR_OPTIONS,
-            companies: purchase_types_1.CAR_COMPANIES
+            companies: purchase_types_1.CAR_COMPANIES,
         };
         response_1.ApiResponse.success(res, http_status_codes_1.StatusCodes.OK, "Dropdown options retrieved successfully", options);
     }
@@ -214,7 +226,7 @@ const getNextSerialNumber = async (req, res) => {
     try {
         const lastPurchase = await purchase_model_1.Purchase.findOne()
             .sort({ serialNo: -1 })
-            .select('serialNo');
+            .select("serialNo");
         let nextSerial = 1;
         if (lastPurchase && lastPurchase.serialNo) {
             const lastSerial = parseInt(lastPurchase.serialNo);
@@ -223,7 +235,7 @@ const getNextSerialNumber = async (req, res) => {
             }
         }
         response_1.ApiResponse.success(res, http_status_codes_1.StatusCodes.OK, "Next serial number retrieved successfully", {
-            nextSerialNumber: nextSerial.toString()
+            nextSerialNumber: nextSerial.toString(),
         });
     }
     catch (error) {

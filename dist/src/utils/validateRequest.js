@@ -13,25 +13,28 @@ const validateRequest = (schemas) => {
             }
             // Validate query parameters
             if (schemas.query) {
-                req.query = await schemas.query.parseAsync(req.query);
+                const validatedQuery = await schemas.query.parseAsync(req.query);
+                // Store validated query in a custom property since req.query is read-only
+                // Controllers should use req.validatedQuery when available, otherwise fall back to req.query
+                req.validatedQuery = validatedQuery;
             }
             // Validate route parameters
             if (schemas.params) {
-                req.params = await schemas.params.parseAsync(req.params);
+                req.params = (await schemas.params.parseAsync(req.params));
             }
             next();
         }
         catch (error) {
             // Handle Zod validation errors
-            if (error.name === 'ZodError') {
-                const errorMessages = error.errors.map((err) => ({
-                    field: err.path.join('.'),
+            if (error.name === "ZodError") {
+                const errorMessages = (error.issues ?? error.errors ?? []).map((err) => ({
+                    field: err.path.join("."),
                     message: err.message,
-                    code: err.code
+                    code: err.code,
                 }));
                 return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.BAD_REQUEST, "Validation failed", {
                     errors: errorMessages,
-                    message: "Please check your input and try again"
+                    message: "Please check your input and try again",
                 });
             }
             // Handle other errors
@@ -61,15 +64,15 @@ const validateRequestLegacy = (schema) => {
             next();
         }
         catch (error) {
-            if (error.name === 'ZodError') {
-                const errorMessages = error.errors.map((err) => ({
-                    field: err.path.join('.'),
+            if (error.name === "ZodError") {
+                const errorMessages = (error.issues ?? error.errors ?? []).map((err) => ({
+                    field: err.path.join("."),
                     message: err.message,
-                    code: err.code
+                    code: err.code,
                 }));
                 return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.BAD_REQUEST, "Validation failed", {
                     errors: errorMessages,
-                    message: "Please check your input and try again"
+                    message: "Please check your input and try again",
                 });
             }
             return response_1.ApiResponse.error(res, http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, "Validation error", error.message);

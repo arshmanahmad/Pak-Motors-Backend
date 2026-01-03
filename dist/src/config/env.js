@@ -9,14 +9,12 @@ const envalid_1 = require("envalid");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const nodeEnvironment = process.env.NODE_ENV || 'development';
-const envPath = nodeEnvironment !== 'production' ? path_1.default.resolve(process.cwd(), `.env.${nodeEnvironment}`) : null;
-if (envPath && fs_1.default.existsSync(envPath)) {
+const envPath = path_1.default.resolve(process.cwd(), `.env.${nodeEnvironment}`);
+if (fs_1.default.existsSync(envPath)) {
     dotenv_1.default.config({ path: envPath });
 }
 else {
-    if (nodeEnvironment !== 'production') {
-        console.error(`Environment file .env.${process.env.NODE_ENV} not found`);
-    }
+    console.error(`Environment file .env.${nodeEnvironment} not found`);
 }
 exports.env = (0, envalid_1.cleanEnv)(process.env, {
     NODE_ENV: (0, envalid_1.str)({ devDefault: (0, envalid_1.testOnly)('test'), choices: ['development', 'production', 'production.local', 'test'] }),

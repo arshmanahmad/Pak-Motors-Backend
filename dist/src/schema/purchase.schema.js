@@ -29,15 +29,23 @@ exports.PurchaseSchema = zod_1.z.object({
     purchaseFrom: zod_1.z.string().min(1, "Purchase from is required"),
     witness: zod_1.z.string().min(1, "Witness is required"),
     note: zod_1.z.string().optional(),
-    // System fields
-    userId: zod_1.z.string().min(1, "User ID is required")
+    // userId is extracted from JWT token in authenticate middleware
 });
-exports.UpdatePurchaseSchema = exports.PurchaseSchema.partial().omit({ userId: true });
+exports.UpdatePurchaseSchema = exports.PurchaseSchema.partial();
 exports.PurchaseQuerySchema = zod_1.z.object({
-    page: zod_1.z.string().optional().transform(val => val ? parseInt(val) : 1),
-    limit: zod_1.z.string().optional().transform(val => val ? parseInt(val) : 10),
+    page: zod_1.z
+        .string()
+        .optional()
+        .transform((val) => (val ? parseInt(val) : 1)),
+    limit: zod_1.z
+        .string()
+        .optional()
+        .transform((val) => (val ? parseInt(val) : 10)),
     search: zod_1.z.string().optional(),
     company: zod_1.z.string().optional(),
     carModel: zod_1.z.string().optional(),
-    isNew: zod_1.z.string().optional().transform(val => val === 'true' ? true : val === 'false' ? false : undefined)
+    isNew: zod_1.z
+        .string()
+        .optional()
+        .transform((val) => val === "true" ? true : val === "false" ? false : undefined),
 });
