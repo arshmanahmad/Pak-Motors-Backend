@@ -1,39 +1,42 @@
-import nodemailer from 'nodemailer';
-import { env } from '../config/env';
+import nodemailer from "nodemailer";
+import { env } from "../config/env";
 
 // Create transporter for sending emails
 const createTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail', // Using Outlook/Hotmail instead of Gmail
+    service: "gmail", // Using Outlook/Hotmail instead of Gmail
     auth: {
       user: env.EMAIL_USER,
-      pass: env.EMAIL_PASSWORD
-    }
+      pass: env.EMAIL_PASSWORD,
+    },
   });
 };
 
 // Email templates
-const getOtpEmailTemplate = (code: string, purpose: 'signup' | 'login' | 'reset') => {
+const getOtpEmailTemplate = (
+  code: string,
+  purpose: "signup" | "login" | "reset"
+) => {
   const subject =
-    purpose === 'signup'
-      ? 'Verify Your Email - Pak Motors'
-      : purpose === 'login'
-      ? 'Login Verification Code - Pak Motors'
-      : 'Reset Your Password - Pak Motors';
+    purpose === "signup"
+      ? "Verify Your Email - Pak Motors"
+      : purpose === "login"
+      ? "Login Verification Code - Pak Motors"
+      : "Reset Your Password - Pak Motors";
 
   const heading =
-    purpose === 'signup'
-      ? 'Welcome to Pak Motors!'
-      : purpose === 'login'
-      ? 'Login Verification'
-      : 'Password Reset Request';
+    purpose === "signup"
+      ? "Welcome to Pak Motors!"
+      : purpose === "login"
+      ? "Login Verification"
+      : "Password Reset Request";
 
   const intro =
-    purpose === 'signup'
-      ? 'Thank you for signing up with Pak Motors. To complete your registration, please verify your email address using the OTP below:'
-      : purpose === 'login'
-      ? 'Use the OTP below to verify your login and continue securely:'
-      : 'You have requested to reset your password. Use the OTP below to proceed:';
+    purpose === "signup"
+      ? "Thank you for signing up with Pak Motors. To complete your registration, please verify your email address using the OTP below:"
+      : purpose === "login"
+      ? "Use the OTP below to verify your login and continue securely:"
+      : "You have requested to reset your password. Use the OTP below to proceed:";
 
   const html = `
     <!DOCTYPE html>
@@ -65,7 +68,13 @@ const getOtpEmailTemplate = (code: string, purpose: 'signup' | 'login' | 'reset'
       </div>
       
       <div style="text-align: center; color: #666; font-size: 14px;">
-        <p>If you didn't request this ${purpose === 'signup' ? 'verification' : purpose === 'login' ? 'login verification' : 'password reset'}, please ignore this email.</p>
+        <p>If you didn't request this ${
+          purpose === "signup"
+            ? "verification"
+            : purpose === "login"
+            ? "login verification"
+            : "password reset"
+        }, please ignore this email.</p>
         <p style="margin-top: 20px;">
           <strong>Pak Motors Team</strong><br>
           Your trusted automotive partner
@@ -84,7 +93,13 @@ Your OTP: ${code}
 
 This OTP is valid for 10 minutes and can only be used once.
 
-If you didn't request this ${purpose === 'signup' ? 'verification' : purpose === 'login' ? 'login verification' : 'password reset'}, please ignore this email.
+If you didn't request this ${
+    purpose === "signup"
+      ? "verification"
+      : purpose === "login"
+      ? "login verification"
+      : "password reset"
+  }, please ignore this email.
 
 Pak Motors Team
   `;
@@ -92,14 +107,18 @@ Pak Motors Team
   return { subject, html, text };
 };
 
-export const sendOtpEmail = async (email: string, code: string, purpose: 'signup' | 'login' | 'reset' = 'signup') => {
+export const sendOtpEmail = async (
+  email: string,
+  code: string,
+  purpose: "signup" | "login" | "reset" = "signup"
+) => {
   try {
     // ALWAYS send email now (no dev short-circuit)
-    console.log('Email config:', {
+    console.log("Email config:", {
       user: env.EMAIL_USER,
       hasPassword: !!env.EMAIL_PASSWORD,
       email: email,
-      purpose
+      purpose,
     });
 
     const transporter = createTransporter();
@@ -110,37 +129,24 @@ export const sendOtpEmail = async (email: string, code: string, purpose: 'signup
       to: email,
       subject,
       text,
-      html
+      html,
     };
 
-    console.log('Sending email with options:', { to: email, subject, purpose });
+    console.log("Sending email with options:", { to: email, subject, purpose });
     const result = await transporter.sendMail(mailOptions);
     console.log(`OTP email sent to ${email}:`, result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error: any) {
-    console.error('Error sending OTP email:', error);
+    console.error("Error sending OTP email:", error);
     return { success: false, error: error.message };
   }
 };
 
 export const sendWelcomeEmail = async (email: string, name: string) => {
   try {
-    // In development mode, skip actual email sending
-    const isDev = env.NODE_ENV !== 'production';
-    
-    if (isDev) {
-      console.log('🔧 DEVELOPMENT MODE: Welcome email sending disabled');
-      console.log(`📧 Would send welcome email to ${name} (${email})`);
-      return { 
-        success: true, 
-        messageId: 'dev-mode-welcome-' + Date.now(),
-        devMode: true 
-      };
-    }
-
     const transporter = createTransporter();
-    
-    const subject = 'Welcome to Pak Motors!';
+
+    const subject = "Welcome to Pak Motors!";
     const html = `
       <!DOCTYPE html>
       <html>
@@ -188,14 +194,14 @@ Pak Motors Team
       to: email,
       subject,
       text,
-      html
+      html,
     };
 
     const result = await transporter.sendMail(mailOptions);
     console.log(`Welcome email sent to ${email}:`, result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error: any) {
-    console.error('Error sending welcome email:', error);
+    console.error("Error sending welcome email:", error);
     return { success: false, error: error.message };
   }
 };
