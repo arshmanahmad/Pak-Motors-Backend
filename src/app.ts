@@ -15,16 +15,12 @@ export const createApp = () => {
   app.use(express.json());
 
   // Parse CORS_ORIGIN - handle semicolon-separated origins or single origin
-  // In development, allow all origins for easier testing
-  const corsOptions =
-    env.NODE_ENV === "development"
-      ? { origin: true, credentials: true } // Allow all origins in development
-      : {
-          origin: env.CORS_ORIGIN.includes(";")
-            ? env.CORS_ORIGIN.split(";").map((origin) => origin.trim())
-            : env.CORS_ORIGIN,
-          credentials: true,
-        };
+  const corsOptions = {
+    origin: env.CORS_ORIGIN.includes(";")
+      ? env.CORS_ORIGIN.split(";").map((origin) => origin.trim())
+      : env.CORS_ORIGIN,
+    credentials: true,
+  };
 
   app.use(cors(corsOptions));
   app.use("/api", healthRouter);

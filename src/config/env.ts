@@ -1,9 +1,7 @@
 import dotenv from "dotenv";
-import { cleanEnv, host, num, port, str, testOnly, url } from "envalid";
+import { cleanEnv, host, num, port, str, url } from "envalid";
 import fs from "fs";
 import path from "path";
-
-const nodeEnvironment = process.env.NODE_ENV || "development";
 
 // Always load .env file
 const envPath = path.resolve(process.cwd(), ".env");
@@ -17,24 +15,20 @@ if (fs.existsSync(envPath)) {
 }
 
 export const env = cleanEnv(process.env, {
-  NODE_ENV: str({
-    devDefault: testOnly("test"),
-    choices: ["development", "production", "production.local", "test"],
-  }),
-  HOST: host({ devDefault: testOnly("localhost") }),
-  PORT: port({ devDefault: testOnly(3000) }),
+  HOST: host({ default: "localhost" }),
+  PORT: port({ default: 3000 }),
   CORS_ORIGIN: str({
-    devDefault: testOnly("http://localhost:3001;http://localhost:3000"),
+    default: "http://localhost:3001;http://localhost:3000",
   }),
-  COMMON_RATE_LIMIT_MAX_REQUESTS: num({ devDefault: testOnly(1000) }),
-  COMMON_RATE_LIMIT_WINDOW_MS: num({ devDefault: testOnly(1000) }),
+  COMMON_RATE_LIMIT_MAX_REQUESTS: num({ default: 1000 }),
+  COMMON_RATE_LIMIT_WINDOW_MS: num({ default: 1000 }),
   MONGO_URL: url({
-    devDefault: testOnly("mongodb://localhost:27017/wrytify-db"),
+    default: "mongodb://localhost:27017/pak-motors-db",
   }),
-  JWT_SECRET_KEY: str({ devDefault: testOnly("mySecret") }),
-  JWT_EXPIRES_IN: str({ devDefault: testOnly("1d") }),
-  BCRYPT_SALT_ROUNDS: num({ devDefault: testOnly(10) }),
+  JWT_SECRET_KEY: str({ default: "mySecret" }),
+  JWT_EXPIRES_IN: str({ default: "1d" }),
+  BCRYPT_SALT_ROUNDS: num({ default: 10 }),
 
-  EMAIL_USER: str({ devDefault: testOnly("arshman@gmail.com") }),
-  EMAIL_PASSWORD: str({ devDefault: testOnly("124345$arsh") }),
+  EMAIL_USER: str({ default: "your-email@gmail.com" }),
+  EMAIL_PASSWORD: str({ default: "your-app-password" }),
 });

@@ -36,7 +36,6 @@ Then update the values in `.env` with your actual configuration.
 
 ### Required Environment Variables
 
-- `NODE_ENV` - Environment name (development, production, etc.)
 - `HOST` - Server host (default: localhost, use 0.0.0.0 for production)
 - `PORT` - Server port (default: 3000)
 - `CORS_ORIGIN` - Allowed CORS origins (semicolon-separated for multiple)
@@ -51,8 +50,8 @@ See `env.example` for a complete template.
 
 ## Scripts
 
-- `npm run dev`: run in development mode with hot-reload
-- `npm run start`: run in production mode
+- `npm run dev`: run with hot-reload (watches for file changes)
+- `npm run start`: run the server
 
 ## Health check
 

@@ -16,7 +16,7 @@ mongoose
 
     app.listen(env.PORT, () => {
       // eslint-disable-next-line no-console
-      console.log(`Server running on port ${env.PORT} in ${env.NODE_ENV} mode`);
+      console.log(`Server running on port ${env.PORT}`);
     });
   })
   .catch((error) => {
